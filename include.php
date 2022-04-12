@@ -16,20 +16,29 @@ function rtf2txt($filename)
 {
 	// Read the data from the input file.
 	$text = file_get_contents($filename);
-	// Removes hyperlinks
+
+	$trStart = "\\\\trowd.*\n";
+	$cellDef = ".*\\\\cellx\d+\n";
+	$cell = "\n.*\n(.*)\\\\intbl\\\\cell\n";
+	$cellLineBreak = "\\\\par\n\\\\pard\\\\plain\\\\s0\\\\f0\\\\fs24\\\\q\w\\\\fi0\\\\li0\\\\b0\\\\i0\\\\nosupersub\\\\ul0\\\\strike0\\\\intbl\n";
+	$trEnd = "\n{$trStart}{$cellDef}{$cellDef}{$cellDef}\\\\row\n";
+
+	// метка конца таблиц
+	$text = str_replace("\\row\n\\pard","\\row\n#TABLE_END#\n\\pard",$text);
+	// убираем переносы внутри ячеек
+	$text = preg_replace("/{$cellLineBreak}/"," ",$text);
+	// картинки в ячейках
+	$text = preg_replace("/\{\\\\~\}\{[.\s\S]*?\}\}\n/","*IMAGE*",$text);
+	// примечания со ссылками
 	$text = preg_replace('/\\{\\\\field\\{\\\\\\*\\\\fldinst\\{HYPERLINK \\\\\\\\l Par\d+  \\\\\\\\o "[^\\}]+\\}\\}\\{\\\\fldrslt\\\\cf2 ([^\\}]+)\\}\\}\n/','$1',$text);
-	$text = str_replace(
-		['{\uc1\u9474-}'
-			,'{\uc1\u9484-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9516-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9516-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9488-}'
-			,'{\uc1\u9500-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9532-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9532-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9508-}'
-			,'{\uc1\u9492-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9524-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9524-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9472-}{\uc1\u9496-}'
-		]
-		,['|'
-			,'#TABLE_HEADER#'
-			,'#TABLE_START#'
-			,'#TABLE_END#'
-		]
-		,$text);
+	// разбор строк таблицы
+	$text = preg_replace("/{$trStart}{$cellDef}{$cellDef}{$cellDef}{$cell}{$cell}{$cell}{$trEnd}/m","|$1|$2|$3|\n",$text);
+	// разбор строк таблицы c объединенной первой ячейкой
+	$text = preg_replace("/{$trStart}{$cellDef}{$cellDef}{$cellDef}\\\\intbl\\\\cell\n{$cell}{$cell}{$trEnd}/m","||$1|$2|\n",$text);
+	// разбор строк таблицы c объединенной первой и последней ячейками
+	$text = preg_replace("/{$trStart}{$cellDef}{$cellDef}{$cellDef}\\\\intbl\\\\cell\n{$cell}\\\\intbl\\\\cell\n{$trEnd}/m","||$1||\n",$text);
+	// разбор строк таблицы c объединенной последней ячейкой
+	$text = preg_replace("/{$trStart}{$cellDef}{$cellDef}{$cellDef}{$cell}{$cell}\\\\intbl\\\\cell\n{$trEnd}/m","|$1|$2||\n",$text);
 
 	if (!strlen($text))
 		return "";
@@ -201,6 +210,10 @@ function rtf2txt($filename)
 				break;
 		}
 	}
+
+	// метка начала таблиц
+	$document = str_replace($replace = '|Код ТН ВЭД|Наименование позиции|Доп. ед. изм.|',"#TABLE_HEADER#\n".$replace."\n#TABLE_START#",$document);
+
 	// Return result.
 	return $document;
 }

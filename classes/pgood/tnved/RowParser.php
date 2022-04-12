@@ -19,7 +19,9 @@ class RowParser{
 	}
 
 	function unit(){
-		return $this->arRow['unit'];
+		return '-' === $this->arRow['unit']
+			? null
+			: $this->arRow['unit'];
 	}
 
 	function level(){
@@ -58,7 +60,7 @@ class RowParser{
 
 	protected static function parse($v){
 		$m = null;
-		mb_ereg('\|([^\|]+)\|([^\|]+)\|([^\|]+)\|',$v,$m);
+		mb_ereg('\|([^\|]*)\|([^\|]*)\|([^\|]*)\|',$v,$m);
 		return $m 
 			? ['code' => trim($m[1]),'name' => trim($m[2]),'unit' => trim($m[3])]
 			: null;
